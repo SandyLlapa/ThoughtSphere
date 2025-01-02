@@ -1,0 +1,30 @@
+#navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background-color: #1d4ba8;
+  color: white;
+  position: relative;
+}
+
+
+.buttonsNav {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.buttonsNav button {
+  background-color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+#profileImage{
+  border:solid 3px black;
+  min-height:50px;
+  min-width:20px;
+}
