@@ -49,11 +49,16 @@ app.get('/profile.html', function (req, res) {
 
 
 // Create account -> GET
-app.get('/createAccount.html', function (req, res) {
+app.get('/signup.html', function (req, res) {
+  console.log('GET /signup.html triggered');
+  console.log('Session:', req.session);
+
   if (req.session && req.session.loggedIn) {
-    res.redirect('/profile.html'); //if successful redirect to contacts page 
+    console.log('User is logged in, redirecting to /profile.html');
+    res.redirect('/profile.html');
   } else {
-    res.sendFile('createAccount.html', { root: 'static/html' }); // if not try again
+    console.log('User is not logged in, serving signup.html');
+    res.sendFile('signup.html', { root: 'static/html' });
   }
 });
 
@@ -171,10 +176,12 @@ app.post('/add-thought', function (req, res) {
   if (req.session && req.session.loggedIn) {
     const postData = req.body;
     const username = req.session.username;
+    console.log("THOUGHT ENTRY: ",req.body.thought);
+    console.log("POST ADD-THOUGHT");
 
 
-    const query='INSERT INTO thoughts (username,thought) VALUES($1,$2)';
-    connection.query(query, [postData.thought,username], function (err, result) {
+    const query = 'INSERT INTO thoughts (username,thought) VALUES($1,$2)';
+    connection.query(query, [username,postData.thought], function (err, result) {
       if (err) {
         throw err;
       }
@@ -188,6 +195,7 @@ app.post('/add-thought', function (req, res) {
 
 // show table contents  -> GET
 app.get('/thoughts', function (req, res) {
+  console.log("GET THOUGHTS");
 
   if (req.session && req.session.loggedIn) {
     const username = req.session.username;

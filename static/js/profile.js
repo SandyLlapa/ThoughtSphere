@@ -34,10 +34,11 @@ function makeTable(items) {
 
   items.forEach(item => {
     const row = document.createElement('tr');
+    const date = new Date(item.created_at).toISOString().split('T')[0]; 
 
     row.innerHTML = `
       <td style="text-align: center; vertical-align: middle;">${item.thought}</td>
-      <td style="text-align: center; vertical-align: middle;">${item.created_at}</td>
+      <td style="text-align: center; vertical-align: middle;">${date}</td>
       <td style="text-align: center; vertical-align: middle;">
         <button id="comments-${item.id}" class="commentButton">comment</button>
       </td>

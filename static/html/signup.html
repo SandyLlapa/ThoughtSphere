@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-  <link rel="stylesheet" href="/static/css/signup.css">
+  <link rel="stylesheet" href="/css/signup.css">
 </head>
+
 <body>
 
 
   <div id="container">
     <p id="title">Sign up</p>
 
-    <form id="login">
+    <form id="signform" action="createAccount" method="POST">
       <div id="usernameInput">
         <label for="username"></label>
         <input type="text" id="username" name="username" size="50" placeholder="Create username" required>
@@ -25,18 +27,19 @@
         <br><br>
       </div>
       <input id="loginButton" type="submit" value="Sign in">
-      
+
     </form>
 
-    <p>Already have an account? <span><a href="/static/html/login.html">Login now</a></span></p>
-   
+    <p>Already have an account? <span><a href="/html/login.html">Login now</a></span></p>
+
   </div>
 
-  
+
 
 
   <script src="/js/signup.js"></script>
 
-  
+
 </body>
+
 </html>
