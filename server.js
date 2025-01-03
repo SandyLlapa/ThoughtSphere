@@ -47,10 +47,79 @@ app.get('/profile.html', function (req, res) {
   }
 });
 
+
+// Create account -> GET
+app.get('/createAccount.html', function (req, res) {
+  if (req.session && req.session.loggedIn) {
+    res.redirect('/profile.html'); //if successful redirect to contacts page 
+  } else {
+    res.sendFile('createAccount.html', { root: 'static/html' }); // if not try again
+  }
+});
+
+app.post('/createAccount', function (req, res) {
+  const SALT_ROUNDS_COUNT = 10;
+  const username = req.body.username;
+  const password = req.body.password;
+
+  // hash password to store in database 
+  const hashedPassword = bcrypt.hashSync(password, SALT_ROUNDS_COUNT);
+  connection.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword], function (err, results) {
+
+    if (err) {
+      console.error('Error creating account: ', err);
+      console.log('body =', req.body);
+      console.log('username ID =', req.body.id);
+      console.log('username username =', req.body.username);
+      console.log('username password =', req.body.password);
+
+      if (err.code == '23505') {
+        return res.status(409).send('Username already exists');
+      }
+      return res.status(500).send('Failed to create account');
+    }
+
+    // regenerate session
+    req.session.regenerate((err) => {
+      if (err) {
+        console.error('Error in regenerating session');
+        return res.status(500).send('Failed to regenerate session');
+      }
+      req.session.loggedIn = true;
+      req.session.username = username;
+      res.status(200).send('Successfully created account');
+    });
+  });
+});
+
+
+
+// Get route: Log out 
+app.get('/logout', function (req, res) {
+
+  if (req.session) {
+    req.session.destroy(err => {
+      if (err) {
+        console.error("Error in destroying session: ", err);
+        return res.status(500).send('Error logging out');
+      }
+
+      // Redirect to login page
+      console.log("Session Destroyed");
+      res.redirect('/login.html');
+    });
+  }
+  else {
+    console.log("Not logged in, cannot destroy session");
+    res.redirect('/login.html');
+  }
+});
+
+
 //get login.html route
 app.get('/login.html', function (req, res) {
   if (req.session && req.session.loggedIn) {
-    res.redirect('/profile.html');
+    res.redirect('/home.html');
   }
   else {
     res.sendFile('login.html', { root: 'static/html' });
@@ -58,4 +127,40 @@ app.get('/login.html', function (req, res) {
 });
 
 
+//post login route
+app.post('/login', function (req, res) {
+  const username = req.body.username;
+  const password = req.body.password;
 
+  connection.query('SELECT password FROM users WHERE username = $1', [username], function (err, results) {
+    if (err) {
+      console.error("Error in database: ", err);
+      return res.status(500).send('Error');
+    }
+
+    if (results.rows.length == 0) {
+      return res.status(401).send('Invalid username');
+    }
+
+    // check if password matches 
+    const passwordDB = results.rows[0].password;
+    const passwordMatch = bcrypt.compareSync(password, passwordDB);
+
+    if (!passwordMatch) {
+      console.log("PASSWORD DOES NOT MATCH");
+      return res.status(401).send('Invalid password');
+    }
+
+    // regenerate session
+    req.session.regenerate((err) => {
+      if (err) {
+        return res.status(401).send('Failed to regenerate session');
+      }
+
+      req.session.loggedIn = true;
+      req.session.username = username;
+      res.status(200).send('Login was successful');
+    });
+  }
+  );
+});
