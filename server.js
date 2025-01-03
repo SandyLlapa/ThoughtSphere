@@ -52,15 +52,31 @@ app.get('/profile', (req, res) => {
   if (req.session && req.session.loggedIn) {
     const username = req.session.username;
 
-    const query = 'SELECT profile_image FROM users WHERE username = $1';
+    // Fetch profile image and About Me data
+    const query = `
+      SELECT users.profile_image, about_me.name, about_me.location, about_me.birthday, about_me.hobby
+      FROM users
+      LEFT JOIN about_me ON users.username = about_me.username
+      WHERE users.username = $1;
+    `;
     connection.query(query, [username], (err, result) => {
       if (err) {
-        console.error('Error fetching profile image:', err);
+        console.error('Error fetching profile data:', err);
         return res.status(500).send('Failed to load profile');
       }
 
-      const profileImage = result.rows[0]?.profile_image || '/uploads/default-profile.png'; // Default image if none exists
-      res.render('profile', { username, profileImage });
+      const profileData = result.rows[0] || {}; // Handle case where no "About Me" data exists
+      const profileImage = profileData.profile_image || '/uploads/default-profile.png';
+      res.render('profile', {
+        username,
+        profileImage,
+        aboutMe: {
+          name: profileData.name || '',
+          location: profileData.location || '',
+          birthday: profileData.birthday || '',
+          hobby: profileData.hobby || '',
+        },
+      });
     });
   } else {
     res.redirect('/login.html');
@@ -195,12 +211,12 @@ app.post('/add-thought', function (req, res) {
   if (req.session && req.session.loggedIn) {
     const postData = req.body;
     const username = req.session.username;
-    console.log("THOUGHT ENTRY: ",req.body.thought);
+    console.log("THOUGHT ENTRY: ", req.body.thought);
     console.log("POST ADD-THOUGHT");
 
 
     const query = 'INSERT INTO thoughts (username,thought) VALUES($1,$2)';
-    connection.query(query, [username,postData.thought], function (err, result) {
+    connection.query(query, [username, postData.thought], function (err, result) {
       if (err) {
         throw err;
       }
@@ -211,6 +227,7 @@ app.post('/add-thought', function (req, res) {
     });
   }
 });
+
 
 // show table contents  -> GET
 app.get('/thoughts', function (req, res) {
@@ -265,3 +282,35 @@ app.post('/uploadImage', (req, res) => {
 
 
 
+app.post('/saveAboutMe', (req, res) => {
+  console.log("SAVE ABOUT ME: ", req.body);
+  const username = req.session.username;
+  const { name, location, birthday, hobby } = req.body;
+  const query = `
+    INSERT INTO about_me (username, name, location, birthday, hobby)
+    VALUES ($1, $2, $3, $4, $5)`;
+  connection.query(query, [username, name, location, birthday, hobby], (err, result) => {
+    if (err) {
+      console.error('Error saving About Me:', err);
+      res.status(500).send('Error saving About Me data');
+    } else {
+      res.status(200).json(result.rows[0]);
+    }
+  });
+});
+
+
+app.get('/getAboutMe', (req, res) => {
+  const username = req.session.username; // Assuming you store the logged-in user's ID in the session
+  const query = `SELECT * FROM about_me WHERE username = $1`;
+  connection.query(query, [username], (err, result) => {
+    if (err) {
+      console.error('Error fetching About Me:', err);
+      res.status(500).send('Error fetching About Me data');
+    } else {
+      res.status(200).json(result.rows);
+      res.redirect('/profile');
+
+    }
+  });
+});

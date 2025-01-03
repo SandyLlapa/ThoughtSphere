@@ -19,6 +19,22 @@ header#navigation
         button(type='submit') Save Image
     #aboutMe
       h2 About Me:
+      form#aboutMeForm(action='/saveAboutMe' method='POST')
+        .form-groups
+          label(for='name') Name:
+          input#name(type='text' name='name' placeholder='Enter your name' value=aboutMe.name required='')
+        .form-group
+          label(for='location') Location:
+          input#location(type='text' name='location' placeholder='Enter your Location' value=aboutMe.location required='')
+        .form-group
+          label(for='birthday') Birthday:
+          input#birthday(type='date' name='birthday' value=aboutMe.birthday required='')
+        .form-group
+          label(for='hobby') Favorite Hobby:
+          input#hobby(type='text' name='hobby' placeholder='Enter your favorite hobby' value=aboutMe.hobby required='')
+        .form-group
+          button(type='submit') Save
+
   #rightPanel
     #postThought
       h2 Leave a thought...
