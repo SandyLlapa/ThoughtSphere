@@ -1,3 +1,13 @@
+body{
+  
+  /* background-image: linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909)); */
+  background-size: cover; 
+  
+  margin:0px;
+  font-family: Arial, Helvetica, sans-serif;
+
+}
+
 #navigation {
   display: flex;
   align-items: center;
@@ -23,8 +33,56 @@
   cursor: pointer;
 }
 
-#profileImage{
-  border:solid 3px black;
-  min-height:50px;
-  min-width:20px;
+#container {
+  display: flex;
+  width: 100%; /* Ensure the container spans the entire width of the viewport */
+  box-sizing: border-box; /* Include padding and borders in the width calculation */
 }
+#profileImage, #aboutMe {
+  margin: 0; /* Reset margin */
+  padding: 0; /* Reset padding */
+  box-sizing: border-box;
+  background-color: rgb(103, 247, 132);
+  width:auto;
+  height:330px
+}
+
+
+#leftPanel {
+  flex: 1;
+  border: solid 3px rgb(255, 0, 0);
+  padding: 15px; /* Add padding */
+  box-sizing: border-box;
+}
+
+#rightPanel {
+  flex: 2; /* More width */
+  border: solid 3px rgb(255, 88, 88);
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+
+#postThought{
+  background-color:aquamarine;
+}
+
+#thread{
+  background-color:blue;
+
+}
+
+#friendList{
+  background-color:deeppink;
+  height:200px;
+  width:100%;
+}
+
+
+#collection{
+  background-color:rgb(249, 0, 54);
+  height:200px;
+  width:100%;
+  
+}
+

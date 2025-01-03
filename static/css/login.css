@@ -105,5 +105,5 @@ input[type=button], input[type=submit], input[type=reset] {
 
 #username, #password{
   height:35px;
-  width:250px;
+  width:20px;
 }

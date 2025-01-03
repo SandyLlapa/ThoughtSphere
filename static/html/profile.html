@@ -17,18 +17,46 @@
 
   <div id="container">
     <div id="leftPanel">
-      <div id="profileImage"></div>
-      <div id="aboutMe"></div>
+      <div id="profileImage">
+        <h2>Username</h2>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+          <input type="file" name="image" accept="image/*" />
+          <button type="submit">Upload</button>
+        </form>
+
+      </div>
+      <div id="aboutMe">
+        <h2>About Me:</h2>
+      </div>
     </div>
 
     <div id="rightPanel">
-      <div id="postThought"></div>
-      <div id="thread"></div>
-      <div id="friendList"></div>
+      <div id="postThought">
+        <h2>Leave a thought...</h2>
+        <form action="/add-thought" method="POST">
+          <div id="thoughtInput">
+            <label for="thought"></label>
+            <textarea id="thought" name="thought" rows="7" cols="60" required></textarea>
+            <br><br>
+          </div>
+    
+    
+          <input type="submit" value="Submit">
+        </form>
+      </div>
+      <div id="thread">
+        <h2>Thought Threads:</h2>
+        <div id="collection"></div>
+      </div>
+      <div id="friendList">
+        <h2>Friend List:</h2>
+      </div>
 
     </div>
 
   </div>
+
+  <script src="/static/js/profile.js"></script>
   
 </body>
 </html>
