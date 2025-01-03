@@ -4,9 +4,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home</title>
+  <link rel="stylesheet" href="/static/css/home.css">
 </head>
 <body>
+
+  <header id="navigation">
+    <div class="buttonsNav">
+      <button onclick="window.location.href='/profile'">My Profile</button>
+      <button onclick="window.location.href='/logout'">Log out</button>
+    </div>
+
+
+  </header>
+
+  <div id="container1">
+    <h1>Find Friends</h1>
+    <div id="searchBar">
+      <h2>Username:</h2>
+      <form id="search">
+        <div id="usernameInput">
+          <label for="username"></label>
+          <input type="text" id="username" name="username" size="50" placeholder="Username" required>
+          <br><br>
+        </div>
   
+        <input id="submitButton" type="submit" value="Search">
+        
+      </form>
+    </div>
+
+  </div>
+
+  <div id="container2">
+    <h1>The Thought Pool</h1>
+    <div id="pool"></div>
+
+  </div>
   
 </body>
 </html>

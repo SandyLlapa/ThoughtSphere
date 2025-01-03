@@ -1,6 +1,6 @@
 body{
   
-  /* background-image: linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909)); */
+  background-image: linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909));
   background-size: cover; 
   
   margin:0px;
@@ -42,47 +42,52 @@ body{
   margin: 0; /* Reset margin */
   padding: 0; /* Reset padding */
   box-sizing: border-box;
-  background-color: rgb(103, 247, 132);
+  background-color: rgb(255, 255, 255);
   width:auto;
-  height:330px
+  height:330px;
+  border-radius: 10px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 
 #leftPanel {
   flex: 1;
-  border: solid 3px rgb(255, 0, 0);
+  /* border: solid 3px rgb(255, 255, 255); */
   padding: 15px; /* Add padding */
   box-sizing: border-box;
 }
 
 #rightPanel {
   flex: 2; /* More width */
-  border: solid 3px rgb(255, 88, 88);
+  /* border: solid 3px rgb(255, 255, 255); */
   padding: 15px;
   box-sizing: border-box;
 }
 
 
 #postThought{
-  background-color:aquamarine;
+  background-color:rgb(255, 255, 255);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
 }
 
 #thread{
-  background-color:blue;
-
+  border-radius: 10px; 
+  background-color:rgb(255, 255, 255);
+  height:200px;
+  width:100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 #friendList{
-  background-color:deeppink;
+  background-color:rgb(255, 255, 255);
   height:200px;
   width:100%;
-}
-
-
-#collection{
-  background-color:rgb(249, 0, 54);
-  height:200px;
-  width:100%;
+  border-radius: 10px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   
 }
+
+
+
 

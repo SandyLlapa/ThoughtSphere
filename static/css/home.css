@@ -1,0 +1,38 @@
+html {
+  min-height: 100%;
+}
+
+body {
+  background-image: linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909));
+  background-size: cover; 
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+
+  display: flex;              /* Enable Flexbox */
+  justify-content: center;    /* Center horizontally */
+  align-items: center;        /* Center vertically */
+  height: 100vh;              /* Full viewport height */
+  flex-direction: column;     /* Stack containers vertically */
+}
+
+#container1, #container2 {
+  width: 60%;                 /* Set a fixed width */
+  background-color: white;    /* Optional background for visibility */
+  padding: 20px;              /* Add padding inside the containers */
+  margin: 10px 0;             /* Add vertical spacing between containers */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Add shadow for a nice effect */
+  border-radius: 10px;        /* Optional: Rounded corners */
+  box-sizing: border-box;     /* Include padding and borders in the width */
+}
+
+#searchBar {
+  height: 150px;
+  width: 100%;                /* Make it responsive */
+  background-color: aquamarine;
+}
+
+#pool {
+  height: 300px;
+  width: 100%;                /* Make it responsive */
+  background-color: aquamarine;
+}

@@ -164,3 +164,54 @@ app.post('/login', function (req, res) {
   }
   );
 });
+
+
+
+app.post('/add-thought', function (req, res) {
+  if (req.session && req.session.loggedIn) {
+    const postData = req.body;
+    const username = req.session.username;
+
+
+    const query='INSERT INTO thoughts (username,thought) VALUES($1,$2)';
+    connection.query(query, [postData.thought,username], function (err, result) {
+      if (err) {
+        throw err;
+      }
+      else {
+        console.log("Values inserted");
+        res.redirect(302, '/profile.html');
+      }
+    });
+  }
+});
+
+// show table contents  -> GET
+app.get('/thoughts', function (req, res) {
+
+  if (req.session && req.session.loggedIn) {
+    const username = req.session.username;
+
+    connection.query('SELECT * FROM thoughts WHERE username=$1', [username], function (err, results) {
+      if (err) throw err;
+
+      if (results.rows.length == 0) {
+        console.log("No entries in thoughts table");
+        console.log(results.body);
+      }
+      else {
+
+        for (var i = 0; i < results.rows.length; i++) {
+          console.log(results.rows[i].id + " " + results.rows[i].status + " " + results.rows[i].todo_item + " " + results.rows[i].deadline);
+        }
+      }
+      res.json(results.rows);
+      console.log("\n" + JSON.stringify(results.rows));
+    });
+  }
+  else {
+    res.redirect('/login.html');
+  }
+});
+
+
