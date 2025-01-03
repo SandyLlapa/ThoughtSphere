@@ -1,0 +1,45 @@
+doctype html
+head
+  meta(charset='UTF-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1.0')
+  title My Profile
+  link(rel='stylesheet' href='/css/profile.css')
+header#navigation
+  .buttonsNav
+    button(onclick="window.location.href='/logout'") Log out
+#container
+  #leftPanel
+    #profileImage
+      h2 Username
+      #image
+        img(src=profileImage alt="Profile Image")
+      form(action='/uploadImage' method='POST')
+        label(for='imageLink') Enter Profile Image URL: 
+        input#imageLink(type='url' name='imageLink' placeholder='Enter image URL' required='')
+        button(type='submit') Save Image
+    #aboutMe
+      h2 About Me:
+  #rightPanel
+    #postThought
+      h2 Leave a thought...
+      form(action='/add-thought' method='POST')
+        #thoughtInput
+          label(for='thought')
+          textarea#thought(name='thought' rows='7' cols='60' required='')
+          br
+          br
+        input(type='submit' value='Submit')
+    #thread
+      h2 Thought Threads:
+      table#collection
+        thead
+          tr#items
+            th Thought
+            th Date
+            th comments
+            th Delete
+        tbody
+          // where the user's thoughts will be displayed
+    #friendList
+      h2 Friend List:
+script(src='/js/profile.js')

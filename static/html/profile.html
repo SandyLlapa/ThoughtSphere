@@ -19,10 +19,13 @@
     <div id="leftPanel">
       <div id="profileImage">
         <h2>Username</h2>
-        <form action="/upload" method="POST" enctype="multipart/form-data">
-          <input type="file" name="image" accept="image/*" />
-          <button type="submit">Upload</button>
+        <div id="image"></div>
+        <form action="/uploadImage" method="POST">
+          <label for="imageLink">Enter Profile Image URL: </label>
+          <input type="url" id="imageLink" name="imageLink" placeholder="Enter image URL" required>
+          <button type="submit">Save Image</button>
         </form>
+
 
       </div>
       <div id="aboutMe">

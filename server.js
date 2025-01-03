@@ -38,27 +38,46 @@ app.use('/js', express.static('static/js'));
 app.use('/css', express.static('static/css'));
 app.use('/images', express.static('static/images'));
 
-app.get('/profile.html', function (req, res) {
-  if (req.session && req.session.loggedIn) { // if logged in, redirect to contacts page 
-    res.sendFile('/profile.html', { root: 'static/html' });
-  }
-  else {
+// app.get('/profile.html', (req, res) => {
+//   if (req.session && req.session.loggedIn) { // if logged in, redirect to contacts page 
+//     res.sendFile('/profile.html', { root: 'static/html' });
+//   }
+//   else {
+//     res.redirect('/login.html');
+//   }
+// });
+
+
+app.get('/profile', (req, res) => {
+  if (req.session && req.session.loggedIn) {
+    const username = req.session.username;
+
+    const query = 'SELECT profile_image FROM users WHERE username = $1';
+    connection.query(query, [username], (err, result) => {
+      if (err) {
+        console.error('Error fetching profile image:', err);
+        return res.status(500).send('Failed to load profile');
+      }
+
+      const profileImage = result.rows[0]?.profile_image || '/uploads/default-profile.png'; // Default image if none exists
+      res.render('profile', { username, profileImage });
+    });
+  } else {
     res.redirect('/login.html');
   }
 });
 
 
 // Create account -> GET
-app.get('/signup.html', function (req, res) {
-  console.log('GET /signup.html triggered');
-  console.log('Session:', req.session);
+app.get('/signup', function (req, res) {
+  console.log('GET /signup triggered');
 
   if (req.session && req.session.loggedIn) {
-    console.log('User is logged in, redirecting to /profile.html');
-    res.redirect('/profile.html');
+    console.log('User is logged in, redirecting to /profile');
+    res.redirect('/profile');
   } else {
-    console.log('User is not logged in, serving signup.html');
-    res.sendFile('signup.html', { root: 'static/html' });
+    console.log('User is not logged in, rendering signup.pug');
+    res.render('signup');
   }
 });
 
@@ -187,7 +206,7 @@ app.post('/add-thought', function (req, res) {
       }
       else {
         console.log("Values inserted");
-        res.redirect(302, '/profile.html');
+        res.redirect(302, '/profile');
       }
     });
   }
@@ -221,5 +240,28 @@ app.get('/thoughts', function (req, res) {
     res.redirect('/login.html');
   }
 });
+
+
+app.post('/uploadImage', (req, res) => {
+  console.log("POST /uploadImage triggered");
+  if (req.session && req.session.loggedIn) {
+    const username = req.session.username;
+    const imageLink = req.body.imageLink;
+
+    // Save the image URL in the database
+    const query = 'UPDATE users SET profile_image = $1 WHERE username = $2';
+    connection.query(query, [imageLink, username], (err) => {
+      if (err) {
+        console.error('Error saving profile image URL:', err);
+        return res.status(500).send('Failed to save profile image');
+      }
+      console.log('Profile image URL updated successfully');
+      res.redirect('/profile');
+    });
+  } else {
+    res.status(401).send('Unauthorized');
+  }
+});
+
 
 

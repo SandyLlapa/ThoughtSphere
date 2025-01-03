@@ -16,7 +16,7 @@ document.getElementById('login').addEventListener('submit', async (event) => {
       throw new Error('Incorrect password/username');
     }
     else { // redirect to contacts.html
-      window.location.href = '/profile.html';
+      window.location.href = '/profile';
     }
   }
   catch (error) { // username/password not in database

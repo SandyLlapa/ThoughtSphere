@@ -16,7 +16,7 @@ document.getElementById('signform').addEventListener('submit',async(event)=>{
       throw new Error('Cannot create account');
     } 
     else{
-      window.location.href='/profile.html';
+      window.location.href='/profile';
     }
   }
   catch(error){

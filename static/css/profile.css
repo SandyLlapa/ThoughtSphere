@@ -1,9 +1,9 @@
-body{
-  
+body {
+
   background-image: linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909));
-  background-size: cover; 
-  
-  margin:0px;
+  background-size: cover;
+
+  margin: 0px;
   font-family: Arial, Helvetica, sans-serif;
 
 }
@@ -35,59 +35,98 @@ body{
 
 #container {
   display: flex;
-  width: 100%; /* Ensure the container spans the entire width of the viewport */
-  box-sizing: border-box; /* Include padding and borders in the width calculation */
-}
-#profileImage, #aboutMe {
-  margin: 0; /* Reset margin */
-  padding: 0; /* Reset padding */
+  width: 100%;
+  /* Ensure the container spans the entire width of the viewport */
   box-sizing: border-box;
-  background-color: rgb(255, 255, 255);
-  width:auto;
-  height:330px;
-  border-radius: 10px; 
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* Include padding and borders in the width calculation */
 }
 
+#profileImage,
+#aboutMe {
+  margin: 0;
+  /* Reset margin */
+  padding: 0;
+  /* Reset padding */
+  box-sizing: border-box;
+  background-color: rgb(255, 255, 255);
+  width: auto;
+  height: 330px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
 #leftPanel {
   flex: 1;
   /* border: solid 3px rgb(255, 255, 255); */
-  padding: 15px; /* Add padding */
+  padding: 15px;
+  /* Add padding */
   box-sizing: border-box;
 }
 
 #rightPanel {
-  flex: 2; /* More width */
+  /* margin-bottom:20px; */
+  flex: 2;
+  /* More width */
   /* border: solid 3px rgb(255, 255, 255); */
   padding: 15px;
   box-sizing: border-box;
 }
 
 
-#postThought{
-  background-color:rgb(255, 255, 255);
+#postThought {
+  background-color: rgb(255, 255, 255);
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-}
-
-#thread{
-  border-radius: 10px; 
-  background-color:rgb(255, 255, 255);
-  height:200px;
-  width:100%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-#friendList{
-  background-color:rgb(255, 255, 255);
-  height:200px;
-  width:100%;
-  border-radius: 10px; 
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  
+#thread {
+  margin-top:20px;
+  border-radius: 10px;
+  max-height: 200px;
+  /* Set the maximum height for the #thread element */
+  overflow-y: auto;
+  /* Enable vertical scrolling when content overflows */
+  border: 1px solid #ccc;
+  /* Optional: Add a border for better visibility */
+  /* padding: 10px; */
+  /* Optional: Add some padding for spacing */
+  box-sizing: border-box;
+  /* Ensure padding and border are included in the height */
+  background-color: rgb(255, 255, 255);
 }
 
 
+#friendList {
+  margin-top:20px;
+  background-color: rgb(255, 255, 255);
+  height: 200px;
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 
+}
+#image {
+  width: 600px; /* Set desired width */
+  height: 1000px; /* Set desired height */
+  overflow: hidden; /* Prevent overflowing */
+  display: flex; /* Center align the image */
+  justify-content: center;
+  align-items: center;
+  /* border:3px solid black; */
+  margin-bottom: 20px;
+}
 
+#image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Fit inside without cropping */
+}
+
+#profileImage {
+  display: flex; /* Enables flexbox */
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  flex-direction: column; /* Optional: Align form elements below the image */
+  /* height: 200px; Set the height of the container */
+  border: 1px solid #ccc; /* Optional: For visibility */
+}
