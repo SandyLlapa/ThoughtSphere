@@ -38,50 +38,6 @@ app.use('/js', express.static('static/js'));
 app.use('/css', express.static('static/css'));
 app.use('/images', express.static('static/images'));
 
-// app.get('/profile.html', (req, res) => {
-//   if (req.session && req.session.loggedIn) { // if logged in, redirect to contacts page 
-//     res.sendFile('/profile.html', { root: 'static/html' });
-//   }
-//   else {
-//     res.redirect('/login.html');
-//   }
-// });
-
-
-app.get('/profile', (req, res) => {
-  if (req.session && req.session.loggedIn) {
-    const username = req.session.username;
-
-    // Fetch profile image and About Me data
-    const query = `
-      SELECT users.profile_image, about_me.name, about_me.location, about_me.birthday, about_me.hobby
-      FROM users
-      LEFT JOIN about_me ON users.username = about_me.username
-      WHERE users.username = $1;
-    `;
-    connection.query(query, [username], (err, result) => {
-      if (err) {
-        console.error('Error fetching profile data:', err);
-        return res.status(500).send('Failed to load profile');
-      }
-
-      const profileData = result.rows[0] || {}; // Handle case where no "About Me" data exists
-      const profileImage = profileData.profile_image || '/uploads/default-profile.png';
-      res.render('profile', {
-        username,
-        profileImage,
-        aboutMe: {
-          name: profileData.name || '',
-          location: profileData.location || '',
-          birthday: profileData.birthday || '',
-          hobby: profileData.hobby || '',
-        },
-      });
-    });
-  } else {
-    res.redirect('/login.html');
-  }
-});
 
 
 // Create account -> GET
@@ -259,24 +215,85 @@ app.get('/thoughts', function (req, res) {
 });
 
 
-app.post('/uploadImage', (req, res) => {
-  console.log("POST /uploadImage triggered");
+
+
+app.get('/profile', (req, res) => {
   if (req.session && req.session.loggedIn) {
     const username = req.session.username;
-    const imageLink = req.body.imageLink;
+    console.log("HELLO");
+    // console.log("USER COLOR: ", users.background);
+    console.log("BYE");
 
-    // Save the image URL in the database
-    const query = 'UPDATE users SET profile_image = $1 WHERE username = $2';
-    connection.query(query, [imageLink, username], (err) => {
+    const query = `
+      SELECT users.profile_image, about_me.name, about_me.location, about_me.birthday, about_me.hobby, users.background
+      FROM users
+      LEFT JOIN about_me ON users.username = about_me.username
+      WHERE users.username = $1;
+    `;
+    connection.query(query, [username], (err, result) => {
       if (err) {
-        console.error('Error saving profile image URL:', err);
-        return res.status(500).send('Failed to save profile image');
+        console.error('Error fetching profile data:', err);
+        return res.status(500).send('Failed to load profile');
       }
-      console.log('Profile image URL updated successfully');
-      res.redirect('/profile');
+
+      const profileData = result.rows[0] || {};
+      const profileImage = profileData.profile_image || '/uploads/default-profile.png';
+      const profileBackground = profileData.background || 'linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909))';
+      console.log("PROFILE BACKGROUND: ", profileBackground);
+
+      res.render('profile', {
+        username,
+        profileImage,
+        profileBackground,
+        aboutMe: {
+          name: profileData.name || '',
+          location: profileData.location || '',
+          birthday: profileData.birthday || '',
+          hobby: profileData.hobby || '',
+        },
+      });
     });
   } else {
-    res.status(401).send('Unauthorized');
+    res.redirect('/login.html');
+  }
+});
+
+
+
+app.get('/profile', (req, res) => {
+  if (req.session && req.session.loggedIn) {
+    const username = req.session.username;
+
+    const query = `
+      SELECT users.profile_image, about_me.name, about_me.location, about_me.birthday, about_me.hobby, users.background
+      FROM users
+      LEFT JOIN about_me ON users.username = about_me.username
+      WHERE users.username = $1;
+    `;
+    connection.query(query, [username], (err, result) => {
+      if (err) {
+        console.error('Error fetching profile data:', err);
+        return res.status(500).send('Failed to load profile');
+      }
+
+      const profileData = result.rows[0] || {};
+      const profileImage = profileData.profile_image || '/uploads/default-profile.png';
+      const profileBackground = profileData.background || 'linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909))';
+
+      res.render('profile', {
+        username,
+        profileImage,
+        profileBackground,
+        aboutMe: {
+          name: profileData.name || '',
+          location: profileData.location || '',
+          birthday: profileData.birthday || '',
+          hobby: profileData.hobby || '',
+        },
+      });
+    });
+  } else {
+    res.redirect('/login.html');
   }
 });
 
@@ -299,6 +316,28 @@ app.post('/saveAboutMe', (req, res) => {
   });
 });
 
+app.post('/saveBackgroundColor', (req, res) => {
+  const username = req.session.username;
+  const { background } = req.body;
+
+  console.log("BACKGROUND BODY: ", background);
+
+  const query = `
+    UPDATE users
+    SET background = $1
+    WHERE username = $2
+  `;
+  connection.query(query, [background, username], (err) => {
+    if (err) {
+      console.error('Error saving background color:', err);
+      res.status(500).send('Error saving background color');
+    } else {
+      res.redirect('/profile');
+    }
+  });
+});
+
+
 
 app.get('/getAboutMe', (req, res) => {
   const username = req.session.username; // Assuming you store the logged-in user's ID in the session
@@ -313,4 +352,13 @@ app.get('/getAboutMe', (req, res) => {
 
     }
   });
+});
+
+
+app.get('/customize', (req, res) => {
+  if (req.session && req.session.loggedIn) {
+    res.sendFile('customize.html', { root: 'static/html' });
+  } else {
+    res.redirect('/login.html');
+  }
 });

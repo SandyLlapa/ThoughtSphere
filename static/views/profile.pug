@@ -6,8 +6,10 @@ head
   link(rel='stylesheet' href='/css/profile.css')
 header#navigation
   .buttonsNav
+    button(onclick="window.location.href='/customize'") Customize
     button(onclick="window.location.href='/logout'") Log out
-#container
+#container(style=`background: ${profileBackground}; display: flex;`)
+
   #leftPanel
     #profileImage
       h2 Username
@@ -17,6 +19,7 @@ header#navigation
         label(for='imageLink') Enter Profile Image URL: 
         input#imageLink(type='url' name='imageLink' placeholder='Enter image URL' required='')
         button(type='submit') Save Image
+
     #aboutMe
       h2 About Me:
       form#aboutMeForm(action='/saveAboutMe' method='POST')
