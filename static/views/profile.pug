@@ -6,6 +6,7 @@ head
   link(rel='stylesheet' href='/css/profile.css')
 header#navigation
   .buttonsNav
+    button(onclick="window.location.href='/home.html'") Home
     button(onclick="window.location.href='/customize'") Customize
     button(onclick="window.location.href='/logout'") Log out
 #container(style=`background: ${profileBackground}; display: flex;`)
@@ -15,6 +16,17 @@ header#navigation
       h2 Username
       #image
         img(src=profileImage alt="Profile Image")
+        // Check if this is someone else's profile
+      if isFriendProfile
+        form(action=`/add-friend/${username}` method='POST')
+          button(type='submit') Add to Friend List
+
+      if !isFriendProfile
+        form(action='/uploadImage' method='POST')
+          label(for='imageLink') Enter Profile Image URL: 
+          input#imageLink(type='url' name='imageLink' placeholder='Enter image URL' required='')
+          button(type='submit') Save Image
+
       form(action='/uploadImage' method='POST')
         label(for='imageLink') Enter Profile Image URL: 
         input#imageLink(type='url' name='imageLink' placeholder='Enter image URL' required='')
@@ -22,21 +34,10 @@ header#navigation
 
     #aboutMe
       h2 About Me:
-      form#aboutMeForm(action='/saveAboutMe' method='POST')
-        .form-groups
-          label(for='name') Name:
-          input#name(type='text' name='name' placeholder='Enter your name' value=aboutMe.name required='')
-        .form-group
-          label(for='location') Location:
-          input#location(type='text' name='location' placeholder='Enter your Location' value=aboutMe.location required='')
-        .form-group
-          label(for='birthday') Birthday:
-          input#birthday(type='date' name='birthday' value=aboutMe.birthday required='')
-        .form-group
-          label(for='hobby') Favorite Hobby:
-          input#hobby(type='text' name='hobby' placeholder='Enter your favorite hobby' value=aboutMe.hobby required='')
-        .form-group
-          button(type='submit') Save
+      p Name: #{aboutMe.name}
+      p Location: #{aboutMe.location}
+      p Birthday: #{aboutMe.birthday}
+      p Hobby: #{aboutMe.hobby}
 
   #rightPanel
     #postThought
@@ -55,10 +56,17 @@ header#navigation
           tr#items
             th Thought
             th Date
-            th comments
-            th Delete
         tbody
-          // where the user's thoughts will be displayed
+          if thoughts && thoughts.length > 0
+            each thought in thoughts
+              tr
+                td= thought.thought
+                td= thought.formattedDate
+          else
+            tr
+              td(colspan="2") No thoughts to display
+
+
     #friendList
       h2 Friend List:
 script(src='/js/profile.js')

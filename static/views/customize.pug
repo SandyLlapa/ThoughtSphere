@@ -1,0 +1,37 @@
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title Customize Your Profile
+    link(rel="stylesheet", href="/css/customize.css")
+  body
+    header#navigation
+      .buttonsNav
+        button(onclick="window.location.href='/profile'") Back to Profile
+        button(onclick="window.location.href='/logout'") Log out
+
+    #customizeContainer
+      h1 Customize Your Profile
+
+      form(action="/saveBackgroundColor" method="POST")
+        div.userInfo
+          label(for="background") Select a Background Color:
+          input#background(type="color" name="background" value=customizationData.background)
+        button(type="submit") Save Background Color
+
+      form(action="/saveAboutMe" method="POST")
+        h2 Edit About Me
+        div.userInfo
+          label(for="name") Name:
+          input#name(type="text" name="name" value=customizationData.name placeholder="Enter your name" required='')
+        div.userInfo
+          label(for="location") Location:
+          input#location(type="text" name="location" value=customizationData.location placeholder="Enter your location" required='')
+        div.userInfo
+          label(for="birthday") Birthday:
+          input#birthday(type="date" name="birthday" value=customizationData.birthday required='')
+        div.userInfo
+          label(for="hobby") Hobby:
+          input#hobby(type="text" name="hobby" value=customizationData.hobby placeholder="Enter your hobby" required='')
+        button(type="submit") Save About Me

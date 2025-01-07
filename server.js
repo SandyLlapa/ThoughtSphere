@@ -40,18 +40,21 @@ app.use('/images', express.static('static/images'));
 
 
 
-// Create account -> GET
 app.get('/signup', function (req, res) {
   console.log('GET /signup triggered');
 
   if (req.session && req.session.loggedIn) {
     console.log('User is logged in, redirecting to /profile');
-    res.redirect('/profile');
+    res.redirect('/profile'); // Redirect to the profile if already logged in
   } else {
-    console.log('User is not logged in, rendering signup.pug');
-    res.render('signup');
+    console.log('User is not logged in, serving signup.html');
+    res.sendFile('signup.html', { root: 'static/html' }); // Serve the static signup.html file
   }
 });
+
+
+
+
 
 app.post('/createAccount', function (req, res) {
   const SALT_ROUNDS_COUNT = 10;
@@ -112,6 +115,7 @@ app.get('/logout', function (req, res) {
 });
 
 
+
 //get login.html route
 app.get('/login.html', function (req, res) {
   if (req.session && req.session.loggedIn) {
@@ -160,6 +164,17 @@ app.post('/login', function (req, res) {
   }
   );
 });
+
+
+app.get('/home.html', function (req, res) {
+  if (req.session && req.session.loggedIn) {
+    // Serve the home.html file directly
+    res.sendFile('home.html', { root: 'static/html' });
+  } else {
+    res.redirect('/login.html');
+  }
+});
+
 
 
 
@@ -241,44 +256,11 @@ app.get('/profile', (req, res) => {
       const profileBackground = profileData.background || 'linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909))';
       console.log("PROFILE BACKGROUND: ", profileBackground);
 
-      res.render('profile', {
-        username,
-        profileImage,
-        profileBackground,
-        aboutMe: {
-          name: profileData.name || '',
-          location: profileData.location || '',
-          birthday: profileData.birthday || '',
-          hobby: profileData.hobby || '',
-        },
-      });
-    });
-  } else {
-    res.redirect('/login.html');
-  }
-});
+      
 
-
-
-app.get('/profile', (req, res) => {
-  if (req.session && req.session.loggedIn) {
-    const username = req.session.username;
-
-    const query = `
-      SELECT users.profile_image, about_me.name, about_me.location, about_me.birthday, about_me.hobby, users.background
-      FROM users
-      LEFT JOIN about_me ON users.username = about_me.username
-      WHERE users.username = $1;
-    `;
-    connection.query(query, [username], (err, result) => {
-      if (err) {
-        console.error('Error fetching profile data:', err);
-        return res.status(500).send('Failed to load profile');
-      }
-
-      const profileData = result.rows[0] || {};
-      const profileImage = profileData.profile_image || '/uploads/default-profile.png';
-      const profileBackground = profileData.background || 'linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909))';
+      const birthday = profileData.birthday
+        ? new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(profileData.birthday))
+        : '';
 
       res.render('profile', {
         username,
@@ -287,7 +269,7 @@ app.get('/profile', (req, res) => {
         aboutMe: {
           name: profileData.name || '',
           location: profileData.location || '',
-          birthday: profileData.birthday || '',
+          birthday: birthday || '',
           hobby: profileData.hobby || '',
         },
       });
@@ -300,21 +282,32 @@ app.get('/profile', (req, res) => {
 
 
 app.post('/saveAboutMe', (req, res) => {
-  console.log("SAVE ABOUT ME: ", req.body);
   const username = req.session.username;
-  const { name, location, birthday, hobby } = req.body;
+  var { name, location, birthday, hobby } = req.body;
+
+  
+
   const query = `
     INSERT INTO about_me (username, name, location, birthday, hobby)
-    VALUES ($1, $2, $3, $4, $5)`;
-  connection.query(query, [username, name, location, birthday, hobby], (err, result) => {
+    VALUES ($1, $2, $3, $4, $5)
+    ON CONFLICT (username)
+    DO UPDATE SET
+      name = EXCLUDED.name,
+      location = EXCLUDED.location,
+      birthday = EXCLUDED.birthday,
+      hobby = EXCLUDED.hobby
+  `;
+
+  connection.query(query, [username, name, location, birthday, hobby], (err) => {
     if (err) {
       console.error('Error saving About Me:', err);
-      res.status(500).send('Error saving About Me data');
-    } else {
-      res.status(200).json(result.rows[0]);
+      return res.status(500).send('Failed to save About Me information');
     }
+
+    res.redirect('/profile'); // Redirect to profile to reflect changes
   });
 });
+
 
 app.post('/saveBackgroundColor', (req, res) => {
   const username = req.session.username;
@@ -357,8 +350,166 @@ app.get('/getAboutMe', (req, res) => {
 
 app.get('/customize', (req, res) => {
   if (req.session && req.session.loggedIn) {
-    res.sendFile('customize.html', { root: 'static/html' });
+    const username = req.session.username;
+
+    const query = `
+      SELECT users.background, about_me.name, about_me.location, about_me.birthday, about_me.hobby
+      FROM users
+      LEFT JOIN about_me ON users.username = about_me.username
+      WHERE users.username = $1;
+    `;
+
+    connection.query(query, [username], (err, result) => {
+      if (err) {
+        console.error('Error fetching customization data:', err);
+        return res.status(500).send('Failed to load customization page');
+      }
+
+      const customizationData = result.rows[0] || {
+        background: 'linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909))',
+        name: '',
+        location: '',
+        birthday: '',
+        hobby: '',
+      };
+
+      if (customizationData.birthday) {
+        customizationData.birthday = new Date(customizationData.birthday).toISOString().split('T')[0];
+      }
+
+      res.render('customize', {
+        username,
+        customizationData,
+      });
+    });
   } else {
     res.redirect('/login.html');
   }
+});
+
+app.get('/search', (req, res) => {
+  if (!req.session || !req.session.loggedIn) {
+    return res.redirect('/login.html');
+  }
+
+  const { username } = req.query;
+
+  const query = `SELECT username FROM users WHERE username = $1`;
+  connection.query(query, [username], (err, result) => {
+    if (err) {
+      console.error('Error searching for user:', err);
+      return res.status(500).send('Error searching for user');
+    }
+
+    if (result.rows.length === 0) {
+      return res.status(404).send('User not found');
+    }
+
+    // Redirect to the friend's profile
+    res.redirect(`/profile/${username}`);
+  });
+});
+
+
+app.get('/profile/:username', (req, res) => {
+  if (!req.session || !req.session.loggedIn) {
+    return res.redirect('/login.html');
+  }
+
+  const loggedInUsername = req.session.username;
+  const profileUsername = req.params.username;
+
+  const profileQuery = `
+    SELECT profile_image, name, location, birthday, hobby, background
+    FROM users
+    LEFT JOIN about_me ON users.username = about_me.username
+    WHERE users.username = $1;
+  `;
+
+  const thoughtsQuery = `
+    SELECT thought, created_at
+    FROM thoughts
+    WHERE username = $1
+    ORDER BY created_at DESC;
+  `;
+
+  connection.query(profileQuery, [profileUsername], (err, profileResult) => {
+    if (err) {
+      console.error('Error fetching user profile:', err);
+      return res.status(500).send('Error loading user profile');
+    }
+
+    if (profileResult.rows.length === 0) {
+      return res.status(404).send('User not found');
+    }
+
+    const profileData = profileResult.rows[0];
+
+    connection.query(thoughtsQuery, [profileUsername], (err, thoughtsResult) => {
+      if (err) {
+        console.error('Error fetching user thoughts:', err);
+        return res.status(500).send('Error loading user thoughts');
+      }
+
+      // Format the `created_at` date
+      const thoughts = thoughtsResult.rows.map(thought => {
+        return {
+          ...thought,
+          formattedDate: new Date(thought.created_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          }),
+        };
+      });
+
+      console.log("Thoughts:", thoughts); // Debug to ensure thoughts are populated
+
+      res.render('profile', {
+        username: profileUsername,
+        profileImage: profileData.profile_image || '/uploads/default-profile.png',
+        profileBackground: profileData.background || 'linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909))',
+        aboutMe: {
+          name: profileData.name || '',
+          location: profileData.location || '',
+          birthday: profileData.birthday || '',
+          hobby: profileData.hobby || '',
+        },
+        thoughts: thoughts || [], // Ensure this is always an array
+        isFriendProfile: loggedInUsername !== profileUsername,
+      });
+    });
+  });
+});
+
+
+
+
+
+app.post('/add-friend/:friendUsername', (req, res) => {
+  if (!req.session || !req.session.loggedIn) {
+    return res.redirect('/login.html');
+  }
+
+  const userUsername = req.session.username;
+  const friendUsername = req.params.friendUsername;
+
+  if (userUsername === friendUsername) {
+    return res.status(400).send('You cannot add yourself as a friend');
+  }
+
+  const query = `
+    INSERT INTO friends (user_username, friend_username)
+    VALUES ($1, $2)
+    ON CONFLICT DO NOTHING;
+  `;
+
+  connection.query(query, [userUsername, friendUsername], (err) => {
+    if (err) {
+      console.error('Error adding friend:', err);
+      return res.status(500).send('Error adding friend');
+    }
+
+    res.redirect(`/profile/${friendUsername}`);
+  });
 });
