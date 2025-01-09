@@ -27,7 +27,7 @@ function makeTable(items) {
 
 }
 
-fetch('/thoughts')
+fetch(`/thoughts?username=${usernameFromBackend}`)
   .then(response => response.json())
   .then(items=>{
     makeTable(items);
@@ -36,3 +36,5 @@ fetch('/thoughts')
   .catch(error=>console.error('Error fetching thoughts:',error));
 
 
+const threadTable = document.querySelector("#collection tbody");
+console.log("Thread table content before JS manipulation:", threadTable.innerHTML);

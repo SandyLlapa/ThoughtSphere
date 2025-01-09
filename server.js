@@ -202,32 +202,29 @@ app.post('/add-thought', function (req, res) {
 
 // show table contents  -> GET
 app.get('/thoughts', function (req, res) {
-  console.log("GET THOUGHTS");
+  const username = req.query.username || req.session.username; // Use query parameter or fallback to session
 
-  if (req.session && req.session.loggedIn) {
-    const username = req.session.username;
-
-    connection.query('SELECT * FROM thoughts WHERE username=$1', [username], function (err, results) {
-      if (err) throw err;
-
-      if (results.rows.length == 0) {
-        console.log("No entries in thoughts table");
-        console.log(results.body);
-      }
-      else {
-
-        for (var i = 0; i < results.rows.length; i++) {
-          console.log(results.rows[i].id + " " + results.rows[i].status + " " + results.rows[i].todo_item + " " + results.rows[i].deadline);
-        }
-      }
-      res.json(results.rows);
-      console.log("\n" + JSON.stringify(results.rows));
-    });
+  if (!username) {
+    return res.status(400).send('Username is required');
   }
-  else {
-    res.redirect('/login.html');
-  }
+
+  const query = `
+    SELECT thought, created_at
+    FROM thoughts
+    WHERE username = $1
+    ORDER BY created_at DESC;
+  `;
+
+  connection.query(query, [username], function (err, results) {
+    if (err) {
+      console.error('Error fetching thoughts:', err);
+      return res.status(500).send('Error fetching thoughts');
+    }
+
+    res.json(results.rows);
+  });
 });
+
 
 
 
@@ -392,7 +389,11 @@ app.get('/search', (req, res) => {
     return res.redirect('/login.html');
   }
 
-  const { username } = req.query;
+  const username = req.query.username;
+
+  console.log("USERNAME SEARCHED FOR: ",username);
+
+
 
   const query = `SELECT username FROM users WHERE username = $1`;
   connection.query(query, [username], (err, result) => {
@@ -416,9 +417,13 @@ app.get('/profile/:username', (req, res) => {
     return res.redirect('/login.html');
   }
 
-  const loggedInUsername = req.session.username;
-  const profileUsername = req.params.username;
+  const loggedInUsername = req.session.username; // The logged-in user's username
+  const profileUsername = req.params.username; // The friend's username from the route parameter
 
+  console.log("Logged-in username: ", loggedInUsername);
+  console.log("Profile being viewed: ", profileUsername);
+
+  // Query to get profile information
   const profileQuery = `
     SELECT profile_image, name, location, birthday, hobby, background
     FROM users
@@ -426,6 +431,7 @@ app.get('/profile/:username', (req, res) => {
     WHERE users.username = $1;
   `;
 
+  // Query to get thoughts of the friend being viewed
   const thoughtsQuery = `
     SELECT thought, created_at
     FROM thoughts
@@ -433,6 +439,7 @@ app.get('/profile/:username', (req, res) => {
     ORDER BY created_at DESC;
   `;
 
+  // Fetch profile data
   connection.query(profileQuery, [profileUsername], (err, profileResult) => {
     if (err) {
       console.error('Error fetching user profile:', err);
@@ -443,30 +450,30 @@ app.get('/profile/:username', (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    const profileData = profileResult.rows[0];
+    const profileData = profileResult.rows[0]; // Friend's profile data
 
+    // Fetch the thoughts for the friend's profile
     connection.query(thoughtsQuery, [profileUsername], (err, thoughtsResult) => {
       if (err) {
         console.error('Error fetching user thoughts:', err);
         return res.status(500).send('Error loading user thoughts');
       }
 
-      // Format the `created_at` date
-      const thoughts = thoughtsResult.rows.map(thought => {
-        return {
-          ...thought,
-          formattedDate: new Date(thought.created_at).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          }),
-        };
-      });
+      // Format the thoughts with readable dates
+      const thoughts = thoughtsResult.rows.map(thought => ({
+        ...thought,
+        formattedDate: new Date(thought.created_at).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        }),
+      }));
 
-      console.log("Thoughts:", thoughts); // Debug to ensure thoughts are populated
+      console.log("Thoughts fetched: ", thoughts);
 
+      // Render the profile page with the friend's data and thoughts
       res.render('profile', {
-        username: profileUsername,
+        username: profileUsername, // Friend's username
         profileImage: profileData.profile_image || '/uploads/default-profile.png',
         profileBackground: profileData.background || 'linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909))',
         aboutMe: {
@@ -475,12 +482,13 @@ app.get('/profile/:username', (req, res) => {
           birthday: profileData.birthday || '',
           hobby: profileData.hobby || '',
         },
-        thoughts: thoughts || [], // Ensure this is always an array
-        isFriendProfile: loggedInUsername !== profileUsername,
+        thoughts, // Pass the friend's thoughts
+        isFriendProfile: loggedInUsername !== profileUsername, // Check if the current user is viewing someone else's profile
       });
     });
   });
 });
+
 
 
 
@@ -491,8 +499,8 @@ app.post('/add-friend/:friendUsername', (req, res) => {
     return res.redirect('/login.html');
   }
 
-  const userUsername = req.session.username;
-  const friendUsername = req.params.friendUsername;
+  const userUsername = req.session.username; // The logged-in user's username
+  const friendUsername = req.params.friendUsername; // The friend's username from the route parameter
 
   if (userUsername === friendUsername) {
     return res.status(400).send('You cannot add yourself as a friend');
@@ -501,7 +509,7 @@ app.post('/add-friend/:friendUsername', (req, res) => {
   const query = `
     INSERT INTO friends (user_username, friend_username)
     VALUES ($1, $2)
-    ON CONFLICT DO NOTHING;
+    ON CONFLICT DO NOTHING; -- Avoid duplicate entries
   `;
 
   connection.query(query, [userUsername, friendUsername], (err) => {
@@ -510,6 +518,31 @@ app.post('/add-friend/:friendUsername', (req, res) => {
       return res.status(500).send('Error adding friend');
     }
 
+    // Redirect to the friend's profile after adding them
     res.redirect(`/profile/${friendUsername}`);
   });
+});
+
+
+
+
+app.post('/uploadImage', (req, res) => {
+  console.log("POST /uploadImage triggered");
+  if (req.session && req.session.loggedIn) {
+    const username = req.session.username;
+    const imageLink = req.body.imageLink;
+
+    // Save the image URL in the database
+    const query = 'UPDATE users SET profile_image = $1 WHERE username = $2';
+    connection.query(query, [imageLink, username], (err) => {
+      if (err) {
+        console.error('Error saving profile image URL:', err);
+        return res.status(500).send('Failed to save profile image');
+      }
+      console.log('Profile image URL updated successfully');
+      res.redirect('/profile');
+    });
+  } else {
+    res.status(401).send('Unauthorized');
+  }
 });

@@ -27,10 +27,6 @@ header#navigation
           input#imageLink(type='url' name='imageLink' placeholder='Enter image URL' required='')
           button(type='submit') Save Image
 
-      form(action='/uploadImage' method='POST')
-        label(for='imageLink') Enter Profile Image URL: 
-        input#imageLink(type='url' name='imageLink' placeholder='Enter image URL' required='')
-        button(type='submit') Save Image
 
     #aboutMe
       h2 About Me:
@@ -58,15 +54,23 @@ header#navigation
             th Date
         tbody
           if thoughts && thoughts.length > 0
+            
+            
             each thought in thoughts
               tr
                 td= thought.thought
                 td= thought.formattedDate
+
           else
-            tr
-              td(colspan="2") No thoughts to display
+            p No thoughts to display
 
 
     #friendList
       h2 Friend List:
+
+
+script.
+  const usernameFromBackend = "#{username}";
+  console.log("Fetching thoughts for username:", usernameFromBackend);
+
 script(src='/js/profile.js')
