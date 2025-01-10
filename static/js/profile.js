@@ -1,7 +1,4 @@
 
-
-
-
 // creates table with updated information
 function makeTable(items) {
   const table = document.querySelector('#collection tbody');
@@ -34,6 +31,33 @@ fetch(`/thoughts?username=${usernameFromBackend}`)
 
   })
   .catch(error=>console.error('Error fetching thoughts:',error));
+
+
+
+
+
+// Fetch and display friends
+fetch('/friends')
+  .then(response => response.json())
+  .then(friends => {
+    const friendListContainer = document.querySelector('#friendListContainer');
+    friendListContainer.innerHTML = ''; // Clear the placeholder
+
+    if (friends.length === 0) {
+      friendListContainer.innerHTML = '<li>No friends to display</li>';
+    } else {
+      friends.forEach(friend => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+          <img src="${friend.profile_image || '/images/default_profile.png'}" alt="${friend.username}" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
+          <span>${friend.username}</span>
+        `;
+        friendListContainer.appendChild(listItem);
+      });
+    }
+  })
+  .catch(error => console.error('Error fetching friends:', error));
+
 
 
 const threadTable = document.querySelector("#collection tbody");

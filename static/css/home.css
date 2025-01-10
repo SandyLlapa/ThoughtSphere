@@ -1,38 +1,139 @@
-html {
-  min-height: 100%;
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  background-image: linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909));
+  /* background-size: cover; */
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column; /* Allow stacking of header and main-container */
+  align-items: center; /* Center horizontally */
 }
 
-body {
-  background-image: linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909));
-  background-size: cover; 
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+#main-container {
+  width: 200%;                 /* Set a fixed width */
+  max-width: 800px;           /* Ensure it doesn't get too wide on larger screens */
+  min-height: 80vh;          /* Increase the minimum height */
+  background-color: rgb(0, 0, 0); /* Optional: Add background for visibility */
+  padding: 20px;              /* Add padding inside the container */
+  border-radius: 10px;        /* Optional: Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Add shadow */
+  box-sizing: border-box;     /* Include padding in the dimensions */
 
-  display: flex;              /* Enable Flexbox */
-  justify-content: center;    /* Center horizontally */
-  align-items: center;        /* Center vertically */
-  height: 100vh;              /* Full viewport height */
-  flex-direction: column;     /* Stack containers vertically */
+  display: flex;              /* Enable Flexbox for internal alignment */
+  flex-direction: column;     /* Stack child elements vertically */
+  justify-content: flex-start; /* Align children to the top */
+  align-items: center;        /* Center horizontally */
+  overflow: hidden; 
+}
+
+#container1{
+  height:30%;
 }
 
 #container1, #container2 {
-  width: 60%;                 /* Set a fixed width */
-  background-color: white;    /* Optional background for visibility */
-  padding: 20px;              /* Add padding inside the containers */
-  margin: 10px 0;             /* Add vertical spacing between containers */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Add shadow for a nice effect */
-  border-radius: 10px;        /* Optional: Rounded corners */
-  box-sizing: border-box;     /* Include padding and borders in the width */
+  width: 100%;
+  background-color: white;
+  
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
 
 #searchBar {
   height: 150px;
-  width: 100%;                /* Make it responsive */
-  background-color: aquamarine;
+  width: 100%;     
 }
 
 #pool {
-  height: 300px;
-  width: 100%;                /* Make it responsive */
-  background-color: aquamarine;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.thought-item {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.friend-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.friend-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.thought-content {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.thought-date {
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+}
+
+
+
+#container2 {
+  width: 100%; 
+  background-color: white; 
+  padding: 20px;
+  margin: 10px 0; /* Add vertical spacing between containers */
+  border-radius: 10px; /* Optional: Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Add shadow */
+  box-sizing: border-box; /* Include padding and borders in the dimensions */
+  
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;  
+}
+
+
+#thought-pool-header {
+  position: sticky; /* Make the header sticky */
+  top: 0; /* Stick to the top of the container */
+  background-color: white; /* Same background as the container */
+  z-index: 10; /* Ensure it stays above scrollable content */
+  padding: 10px 0; /* Add padding for spacing */
+
+}
+
+#pool {
+  flex: 1; /* Take the remaining space in the container */
+  overflow-y: auto; /* Enable vertical scrolling */
+  scrollbar-width: thin; /* Optional: Customize scrollbar for Firefox */
+}
+
+#pool::-webkit-scrollbar {
+  width: 8px; /* Customize scrollbar width for WebKit browsers */
+}
+
+#pool::-webkit-scrollbar-thumb {
+  background-color: #ccc; /* Customize scrollbar thumb color */
+  border-radius: 4px; /* Add rounded corners */
+}
+
+#container2::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
 }

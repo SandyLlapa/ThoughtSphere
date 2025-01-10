@@ -249,11 +249,11 @@ app.get('/profile', (req, res) => {
       }
 
       const profileData = result.rows[0] || {};
-      const profileImage = profileData.profile_image || '/uploads/default-profile.png';
+      const profileImage = profileData.profile_image || '/images/default_profile.png';
       const profileBackground = profileData.background || 'linear-gradient(rgb(55, 218, 255), rgba(207, 120, 237, 0.909))';
       console.log("PROFILE BACKGROUND: ", profileBackground);
 
-      
+
 
       const birthday = profileData.birthday
         ? new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(profileData.birthday))
@@ -282,7 +282,7 @@ app.post('/saveAboutMe', (req, res) => {
   const username = req.session.username;
   var { name, location, birthday, hobby } = req.body;
 
-  
+
 
   const query = `
     INSERT INTO about_me (username, name, location, birthday, hobby)
@@ -391,7 +391,7 @@ app.get('/search', (req, res) => {
 
   const username = req.query.username;
 
-  console.log("USERNAME SEARCHED FOR: ",username);
+  console.log("USERNAME SEARCHED FOR: ", username);
 
 
 
@@ -499,17 +499,19 @@ app.post('/add-friend/:friendUsername', (req, res) => {
     return res.redirect('/login.html');
   }
 
-  const userUsername = req.session.username; // The logged-in user's username
-  const friendUsername = req.params.friendUsername; // The friend's username from the route parameter
+  const userUsername = req.session.username; // Logged-in user's username
+  const friendUsername = req.params.friendUsername; // Friend's username
 
+  // Prevent adding oneself as a friend
   if (userUsername === friendUsername) {
     return res.status(400).send('You cannot add yourself as a friend');
   }
 
+  // Insert friendship into the database
   const query = `
     INSERT INTO friends (user_username, friend_username)
     VALUES ($1, $2)
-    ON CONFLICT DO NOTHING; -- Avoid duplicate entries
+    ON CONFLICT DO NOTHING; -- Prevent duplicate friendships
   `;
 
   connection.query(query, [userUsername, friendUsername], (err) => {
@@ -518,10 +520,11 @@ app.post('/add-friend/:friendUsername', (req, res) => {
       return res.status(500).send('Error adding friend');
     }
 
-    // Redirect to the friend's profile after adding them
+    // Redirect to the friend's profile after adding
     res.redirect(`/profile/${friendUsername}`);
   });
 });
+
 
 
 
@@ -546,3 +549,59 @@ app.post('/uploadImage', (req, res) => {
     res.status(401).send('Unauthorized');
   }
 });
+
+
+
+
+app.get('/friends', (req, res) => {
+  if (!req.session || !req.session.loggedIn) {
+    return res.status(401).send('Unauthorized');
+  }
+
+  const username = req.session.username;
+
+  const query = `
+    SELECT u.username, u.profile_image 
+    FROM friends f
+    JOIN users u ON f.friend_username = u.username
+    WHERE f.user_username = $1;
+  `;
+
+  connection.query(query, [username], (err, results) => {
+    if (err) {
+      console.error('Error fetching friends:', err);
+      return res.status(500).send('Error fetching friends');
+    }
+
+    res.json(results.rows); // Return the list of friends as JSON
+  });
+});
+
+
+app.get('/friends-thoughts', (req, res) => {
+  if (!req.session || !req.session.loggedIn) {
+    return res.status(401).send('Unauthorized');
+  }
+
+  const username = req.session.username;
+
+  const query = `
+  SELECT t.thought, t.created_at, u.username, 
+         COALESCE(u.profile_image, '/images/default_profile.png') AS profile_image
+  FROM thoughts t
+  JOIN friends f ON t.username = f.friend_username
+  JOIN users u ON u.username = f.friend_username
+  WHERE f.user_username = $1
+  ORDER BY t.created_at DESC;
+`;
+
+  connection.query(query, [username], (err, result) => {
+    if (err) {
+      console.error('Error fetching friends\' thoughts:', err);
+      return res.status(500).send('Error fetching friends\' thoughts');
+    }
+
+    res.json(result.rows); // Send the list of friends' thoughts as JSON
+  });
+});
+
