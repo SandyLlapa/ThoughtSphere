@@ -97,10 +97,10 @@ html, body {
   width: 100%; 
   background-color: white; 
   padding: 20px;
-  margin: 10px 0; /* Add vertical spacing between containers */
-  border-radius: 10px; /* Optional: Rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Add shadow */
-  box-sizing: border-box; /* Include padding and borders in the dimensions */
+  margin: 10px 0;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
   
   max-height: 100%;
   display: flex;
@@ -110,27 +110,27 @@ html, body {
 
 
 #thought-pool-header {
-  position: sticky; /* Make the header sticky */
-  top: 0; /* Stick to the top of the container */
-  background-color: white; /* Same background as the container */
-  z-index: 10; /* Ensure it stays above scrollable content */
-  padding: 10px 0; /* Add padding for spacing */
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
+  padding: 10px 0;
 
 }
 
 #pool {
-  flex: 1; /* Take the remaining space in the container */
-  overflow-y: auto; /* Enable vertical scrolling */
-  scrollbar-width: thin; /* Optional: Customize scrollbar for Firefox */
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 #pool::-webkit-scrollbar {
-  width: 8px; /* Customize scrollbar width for WebKit browsers */
+  width: 8px;
 }
 
 #pool::-webkit-scrollbar-thumb {
-  background-color: #ccc; /* Customize scrollbar thumb color */
-  border-radius: 4px; /* Add rounded corners */
+  background-color: #ccc;
+  border-radius: 4px;
 }
 
 #container2::-webkit-scrollbar-thumb {

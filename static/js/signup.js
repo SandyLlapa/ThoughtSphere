@@ -1,4 +1,4 @@
-
+// sign in form
 document.getElementById('signform').addEventListener('submit',async(event)=>{
   event.preventDefault();
   // get user information
@@ -16,7 +16,7 @@ document.getElementById('signform').addEventListener('submit',async(event)=>{
       throw new Error('Cannot create account');
     } 
     else{
-      window.location.href='/profile';
+      window.location.href='/profile'; // open profile
     }
   }
   catch(error){

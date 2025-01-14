@@ -12,8 +12,6 @@ body{
 
 }
 
-
-
 input[type=text]:focus {
   border: 3px solid #d1ff2c;
 }
@@ -53,15 +51,11 @@ input[type=text]:focus {
   margin: 5px;
 }
 
-
-
-
 #container input[type=submit] {
   display: block;
   margin: 20px auto 0;
   text-align: center;
 }
-
 
 input[type=button], input[type=submit], input[type=reset] {
   background-color: #000000;
@@ -75,7 +69,6 @@ input[type=button], input[type=submit], input[type=reset] {
   border-radius: 4px;
   width: 250px;
   text-align: center;
-  
 }
 
 .button{

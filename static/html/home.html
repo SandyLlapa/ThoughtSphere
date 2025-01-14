@@ -1,3 +1,4 @@
+<!-- HOME PAGE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,21 +8,16 @@
   <link rel="stylesheet" href="/css/home.css">
 </head>
 <body>
-
-
-
+  <!-- navigation buttons -->
   <header id="navigation">
     <div class="buttonsNav">
       <button onclick="window.location.href='/profile'">My Profile</button>
       <button onclick="window.location.href='/logout'">Log out</button>
     </div>
-
-
   </header>
 
-
+<!-- Find friend's profile -->
   <div id="main-container">
-
     <div id="container1">
       <h1>Find Friends:</h1>
       <div id="searchBar">
@@ -33,22 +29,18 @@
           </div>
     
           <input id="submitButton" type="submit" value="Search">
-          
         </form>
       </div>
-
     </div>
 
+<!-- Posts from friends appear here-->
     <div id="container2">
       <div id="thought-pool-header">
         <h1>The Thought Pool:</h1>
       </div>
       <div id="pool"></div>
     </div>
-    
   </div>
-
   <script src="/js/home.js"></script>
-  
 </body>
 </html>
